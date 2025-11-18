@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.10, 3.11, 3.12]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Lint with ruff
+      run: |
+        ruff check src/ tests/ scripts/ demo/
+    
+    - name: Format check with black
+      run: |
+        black --check src/ tests/ scripts/ demo/
+    
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v
+    
+    - name: Generate sample data
+      run: |
+        python scripts/generate_data.py --n-users 100 --n-items 50 --n-interactions 1000
+    
+    - name: Train models
+      run: |
+        python scripts/train_models.py
+    
+    - name: Evaluate models
+      run: |
+        python scripts/evaluate_models.py --load-models

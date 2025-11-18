@@ -1,0 +1,72 @@
+# Default configuration for diversity-aware recommendations
+
+# Data configuration
+data:
+  interactions_file: "data/interactions.csv"
+  items_file: "data/items.csv"
+  users_file: "data/users.csv"
+  min_interactions_per_user: 5
+  min_interactions_per_item: 5
+  test_size: 0.2
+  val_size: 0.1
+  random_seed: 42
+
+# Model configuration
+models:
+  popularity:
+    enabled: true
+  
+  user_knn:
+    enabled: true
+    k: 50
+    similarity: "cosine"
+  
+  item_knn:
+    enabled: true
+    k: 50
+    similarity: "cosine"
+  
+  matrix_factorization:
+    enabled: true
+    factors: 50
+    regularization: 0.01
+    iterations: 100
+  
+  diversity_aware:
+    enabled: true
+    diversity_factor: 0.5
+    mmr_lambda: 0.7
+    novelty_weight: 0.3
+
+# Evaluation configuration
+evaluation:
+  metrics:
+    - "precision@5"
+    - "precision@10"
+    - "recall@5"
+    - "recall@10"
+    - "ndcg@5"
+    - "ndcg@10"
+    - "hit_rate@5"
+    - "hit_rate@10"
+    - "coverage"
+    - "novelty"
+    - "diversity"
+    - "popularity_bias"
+  
+  k_values: [5, 10, 20]
+  num_recommendations: 100
+
+# Training configuration
+training:
+  batch_size: 1024
+  learning_rate: 0.01
+  epochs: 50
+  early_stopping_patience: 10
+  save_best_model: true
+
+# Demo configuration
+demo:
+  port: 8501
+  max_recommendations: 20
+  show_explanations: true
